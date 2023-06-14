@@ -1,0 +1,13 @@
+# by KK
+#CMake
+CMakeFiles
+*.CMakeFiles
+CMakeCache.txt
+Makefile
+
+#VSCode
+.vscode
+
+#Custom
+OPENAL
+libSound.a
