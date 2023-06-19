@@ -1,27 +1,35 @@
 #pragma once
 
 #include <iostream>
-
+#include <fstream>
 #include <AL/al.h>
 #include <AL/alc.h>
 
 #define SOUND_BUFFERS (2)
-#define SOUND_BUFF_SIZE (4096)
+#define SOUND_BUFFER_SIZE (65536)
 
 
 class Sound{
 private:
 
     ALuint soundBuffers[SOUND_BUFFERS];
-    char readBuffer[SOUND_BUFF_SIZE];
+
+    ALuint source;
+
     ALint  distanceModel;   // default: AL_NONE - 2D
     int byteCounter;        // how many bytes have been read
+    int readCounter;
+    std::ifstream in;
 
     ALenum checkALerrors(void);
     std::int32_t convert_to_int(char* buffer, std::size_t len);
 public:
     Sound();
     ~Sound();
+
+    int counter;
+    ALint state;
+
     const char * filename;
     // sound parameters
     std::uint8_t channels;
@@ -44,6 +52,9 @@ public:
     bool is3D;       // false: 2D, true: 3D, default: false
 
     //methods
-    bool Open(const char * file);      // if error occurs - returns false, unless returns 0 
+    bool Open(const char * file);      // if error occurs - returns false, unless returns true
+    bool CreateSource(void);           // if error occurs - returns false, unless returns true
+    bool Play(void);                   // if error occurs - returns false, unless returns true
+    bool Update(void);                 // if error: false, unless true
     void PrintSummary(void);
 };

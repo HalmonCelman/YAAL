@@ -8,7 +8,7 @@ add_library( Sound  Sound.h Sound.cpp)
 
 set_property(TARGET Sound PROPERTY CXX_STANDARD 20)
 
-add_executable( OPENAL main.cpp)
+add_executable( OPENAL main.cpp )
 
 set_property(TARGET OPENAL PROPERTY CXX_STANDARD 20)
 

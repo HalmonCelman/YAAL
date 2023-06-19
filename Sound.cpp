@@ -10,10 +10,10 @@
 #include <AL/alc.h>
 
 ALenum Sound::checkALerrors(void){
-    ALenum error = alGetError();
+    ALenum error = 0;
+    error=alGetError();
     if (error) {
         std::cerr << "error: " << alGetString(error) << std::endl;
-     
     }
     return error;
 }
@@ -31,7 +31,7 @@ std::int32_t Sound::convert_to_int(char* buffer, std::size_t len)
 
 bool Sound::Open(const char * file){
     filename = file;
-    std::ifstream in(filename, std::ios::binary);
+    in.open(filename,std::ios::binary);
     char buffer[4];
     if(!in.is_open())
         return false;
@@ -174,9 +174,91 @@ bool Sound::Open(const char * file){
             << (int)bitDepth << " bps" << std::endl;
         return false;
     }
-    
     return true;
 }
+
+bool Sound::CreateSource(void){
+    alGenSources((ALuint)1, &source);
+    if(checkALerrors()) return false;
+
+    alSourcef(source, AL_PITCH, pitch);
+    alSourcef(source, AL_GAIN, gain);
+    alSource3f(source, AL_POSITION, positionX, positionY, positionZ);
+    alSource3f(source, AL_VELOCITY, velocityX, velocityY, velocityZ);
+    alSourcei(source, AL_LOOPING, false);
+    alSourcei(source, AL_DISTANCE_MODEL, distanceModel);
+    if(checkALerrors()) return false;
+
+    std::cout<<"Created source"<<std::endl;
+    return true;
+}
+
+bool Sound::Play(void){ //by streaming technique
+    char * data;
+    data=new char[SOUND_BUFFER_SIZE*SOUND_BUFFERS];
+
+    std::memset(data,0,SOUND_BUFFER_SIZE*SOUND_BUFFERS);
+    in.read(data,SOUND_BUFFER_SIZE*SOUND_BUFFERS);
+
+    alGenBuffers(SOUND_BUFFERS,soundBuffers);
+    //fill at start
+    for(int i=0;i<SOUND_BUFFERS;i++){
+        alBufferData(soundBuffers[i], format, data+i*SOUND_BUFFER_SIZE, SOUND_BUFFER_SIZE, sampleRate);
+        if(checkALerrors()) return false;
+    }
+    readCounter+=SOUND_BUFFER_SIZE*SOUND_BUFFERS;
+    delete [] data;
+
+    alSourceQueueBuffers(source, SOUND_BUFFERS, soundBuffers);
+    if(checkALerrors()) return false;
+    alSourcePlay(source);
+    if(checkALerrors()) return false;
+    state = AL_PLAYING;
+    std::cout<<"Started playing sound"<<std::endl;
+    return true;
+}
+
+bool Sound::Update(void){
+    ALint buffersProcessed = 0;
+
+    alGetSourcei(source,AL_BUFFERS_PROCESSED,&buffersProcessed);
+    if(buffersProcessed <= 0) return true;
+    
+    if(readCounter < size){
+    
+    char * data;
+    data=new char[buffersProcessed*SOUND_BUFFER_SIZE];
+
+    std::memset(data,0,buffersProcessed*SOUND_BUFFER_SIZE);
+    
+    ALuint buffer;
+
+            in.read(data,buffersProcessed*SOUND_BUFFER_SIZE);
+            readCounter+=buffersProcessed*SOUND_BUFFER_SIZE;
+            std::cout<<"loaded: "<<counter<<std::endl;
+    
+    for(int i=0;i<buffersProcessed;i++){
+        
+        alSourceUnqueueBuffers(source,1,&buffer);
+        alBufferData(buffer, format, data+i*SOUND_BUFFER_SIZE, SOUND_BUFFER_SIZE, sampleRate);
+        if(checkALerrors()) return false;
+        alSourceQueueBuffers(source,1,&buffer);
+        counter++;
+    }
+    buffersProcessed=0;
+    state=AL_PLAYING;
+    delete [] data;
+    }else{
+    alGetSourcei(source, AL_SOURCE_STATE, &state);
+
+    if(state!=AL_PLAYING){
+        return false;
+    }
+    }
+
+    return true;
+}
+
 
 void Sound::PrintSummary(void){
     std::cout<<"======================"<<std::endl;
@@ -247,7 +329,9 @@ void Sound::PrintSummary(void){
 
 
 Sound::Sound()
-:   distanceModel   ( AL_NONE ),
+:   counter         ( 0 ),
+    state           ( AL_NONE ),
+    distanceModel   ( AL_NONE ),
     byteCounter     ( 0 ),
     
     channels        ( 0 ),
@@ -273,5 +357,5 @@ Sound::Sound()
 }
 
 Sound::~Sound(){
-
+in.close();
 }
