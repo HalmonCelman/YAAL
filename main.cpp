@@ -95,17 +95,21 @@ alcMakeContextCurrent(NULL);
 alcDestroyContext(context);
 alcCloseDevice(device);
 */
-    Sound mob;
-    mob.Open("YMCA.wav");
+    Sound mob,mob2;
+    mob.Open("getout.wav");
+    mob2.Open("YMCA.wav");
     mob.isLooped = true;
-    mob.PrintSummary();
+    mob2.PrintSummary();
     if(!mob.CreateSource()){
         std::cout<<"from source creation";
     }else{
+        mob2.CreateSource();
         if(!mob.Play()){
             std::cout<<"from play function";
         }else{
-            while(mob.Update()){
+            mob2.Play();
+            while(mob.Update() || mob2.Update()){
+                
             }
         }
     }  

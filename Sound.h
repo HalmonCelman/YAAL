@@ -6,7 +6,7 @@
 #include <AL/alc.h>
 
 #define SOUND_BUFFERS (2)
-#define SOUND_BUFFER_SIZE (65536)
+#define SOUND_BUFFER_SIZE (16*1024)
 
 
 class Sound{
@@ -17,7 +17,6 @@ private:
     ALuint source;
 
     ALint  distanceModel;   // default: AL_NONE - 2D
-    int byteCounter;        // how many bytes have been read
     int readCounter;
     std::ifstream in;
 
