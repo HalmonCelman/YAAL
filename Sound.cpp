@@ -32,7 +32,7 @@ std::int32_t Sound::convert_to_int(char* buffer, std::size_t len)
 bool Sound::Open(const char * file){
     filename = file;
     in.open(filename,std::ios::binary);
-    in.seekg(0);
+    
     char buffer[4];
     if(!in.is_open())
         return false;
@@ -258,11 +258,16 @@ bool Sound::Update(void){
     if(state != AL_PLAYING){
         
             ALuint buffer;
-            alSourceUnqueueBuffers(source,1,&buffer);
+            alSourceUnqueueBuffers(source,2,&buffer);
             in.close();
             free(soundBuffers);
-            return false;
-        
+            if(isLooped){
+                Open(filename);
+                Play();
+                return true;
+            }else{
+                return false;
+            }
     } 
     
     

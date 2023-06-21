@@ -98,7 +98,7 @@ alcCloseDevice(device);
     Sound mob,mob2;
     mob.Open("YMCA.wav");
     mob.PrintSummary();
-    mob.isLooped = true;
+    mob.isLooped = false;
     if(!mob.CreateSource()){
         std::cout<<"from source creation";
     }else{
