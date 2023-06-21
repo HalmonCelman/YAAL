@@ -96,23 +96,34 @@ alcDestroyContext(context);
 alcCloseDevice(device);
 */
     Sound mob,mob2;
-    mob.Open("getout.wav");
-    mob2.Open("YMCA.wav");
+    mob.Open("YMCA.wav");
+    mob.PrintSummary();
     mob.isLooped = true;
-    mob2.PrintSummary();
     if(!mob.CreateSource()){
         std::cout<<"from source creation";
     }else{
-        mob2.CreateSource();
         if(!mob.Play()){
             std::cout<<"from play function";
         }else{
-            mob2.Play();
-            while(mob.Update() || mob2.Update()){
+            while(mob.Update()){
                 
             }
         }
     }  
+
+    mob.Open("getout.wav");
+    mob.PrintSummary();
+    
+        if(!mob.Play()){
+            std::cout<<"from play function";
+        }else{
+            while(mob.Update()){
+                
+            }
+        }
+      
+    
+    
     return 0;
 }
 

@@ -32,6 +32,7 @@ std::int32_t Sound::convert_to_int(char* buffer, std::size_t len)
 bool Sound::Open(const char * file){
     filename = file;
     in.open(filename,std::ios::binary);
+    in.seekg(0);
     char buffer[4];
     if(!in.is_open())
         return false;
@@ -194,11 +195,12 @@ bool Sound::CreateSource(void){
 }
 
 bool Sound::Play(void){ //by streaming technique
+    soundBuffers = (ALuint *)malloc(SOUND_BUFFER_SIZE*SOUND_BUFFERS);
+    
     char * data;
     data=new char[SOUND_BUFFER_SIZE*SOUND_BUFFERS];
 
     std::memset(data,0,SOUND_BUFFER_SIZE*SOUND_BUFFERS);
-    in.seekg(44);
     in.read(data,SOUND_BUFFER_SIZE*SOUND_BUFFERS);
     
     alGenBuffers(SOUND_BUFFERS,soundBuffers);
@@ -257,11 +259,9 @@ bool Sound::Update(void){
         
             ALuint buffer;
             alSourceUnqueueBuffers(source,1,&buffer);
-            alDeleteSources(1,&source);
-            alDeleteBuffers(SOUND_BUFFERS,soundBuffers);
-            CreateSource();
-            Play();
-            return true;
+            in.close();
+            free(soundBuffers);
+            return false;
         
     } 
     
@@ -367,5 +367,4 @@ Sound::Sound()
 }
 
 Sound::~Sound(){
-in.close();
 }

@@ -12,7 +12,7 @@
 class Sound{
 private:
 
-    ALuint soundBuffers[SOUND_BUFFERS];
+    ALuint * soundBuffers;
 
     ALuint source;
 
