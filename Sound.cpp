@@ -195,7 +195,9 @@ bool Sound::CreateSource(void){
 }
 
 bool Sound::Play(void){ //by streaming technique
-    soundBuffers = (ALuint *)malloc(SOUND_BUFFER_SIZE*SOUND_BUFFERS);
+    
+    buffersPlayed = 0;
+    totalBuffers = size/SOUND_BUFFER_SIZE + (size%SOUND_BUFFER_SIZE)?1:0;
     
     char * data;
     data=new char[SOUND_BUFFER_SIZE*SOUND_BUFFERS];
@@ -228,47 +230,51 @@ bool Sound::Update(void){
     if(buffersProcessed <= 0) return true;
 
     for(int i=0;i<buffersProcessed;i++){
-
+        
         if(readCounter < size){
     
             char * data;
             data=new char[SOUND_BUFFER_SIZE];
 
             std::memset(data,0,SOUND_BUFFER_SIZE);
-            
-            ALuint buffer;
 
             in.read(data,SOUND_BUFFER_SIZE);
             readCounter+=SOUND_BUFFER_SIZE;
 
-            alSourceUnqueueBuffers(source,1,&buffer);
-            alBufferData(buffer, format, data, SOUND_BUFFER_SIZE, sampleRate);
+            alSourceUnqueueBuffers(source,1,&soundBuffers[(buffersPlayed % SOUND_BUFFERS)]);
+            alBufferData(soundBuffers[(buffersPlayed % SOUND_BUFFERS)], format, data, SOUND_BUFFER_SIZE, sampleRate);
             if(checkALerrors()) return false;
-            alSourceQueueBuffers(source,1,&buffer);
+            alSourceQueueBuffers(source,1,&soundBuffers[(buffersPlayed % SOUND_BUFFERS)]);
             counter++;
             
             state=AL_PLAYING;
             delete [] data;
-            }
-    }
-
+        }
+        buffersPlayed++;
+    }   
     buffersProcessed=0;
-
+    
     alGetSourcei(source,AL_SOURCE_STATE,&state);
     if(state != AL_PLAYING){
+        if(buffersPlayed >= totalBuffers){
         
             ALuint buffer;
             alSourceUnqueueBuffers(source,2,&buffer);
+            alDeleteBuffers(2,soundBuffers);
+            alDeleteSources(1,&source);
             in.close();
-            free(soundBuffers);
             if(isLooped){
+                CreateSource();
                 Open(filename);
                 Play();
                 return true;
             }else{
                 return false;
             }
-    } 
+        }else{
+            alSourcePlay(source);
+        }
+    }
     
     
 
