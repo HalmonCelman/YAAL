@@ -97,10 +97,10 @@ alcCloseDevice(device);
 */
     Sound mob2,mob;
     mob.Open("YMCA.wav");
-    mob.PrintSummary();
     mob.isLooped = false;
+    mob.PrintSummary();
     mob.CreateSource();
-       mob2.isLooped = true;
+    mob2.isLooped = true;
     mob2.Open("getout.wav");
     mob2.positionX=5;
     mob2.PrintSummary();
@@ -108,7 +108,11 @@ alcCloseDevice(device);
     if(!mob2.Play() || !mob.Play()){
         std::cout<<"from play function - source propably not created";
     }else{
-        while(mob.Update() || mob2.Update()){
+        bool res1=mob.Update();
+        bool res2=mob2.Update();
+        while(res1 || res2){
+            res1=mob.Update();
+            res2=mob2.Update();
         }
     }
         

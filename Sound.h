@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <cstdint>
 #include <fstream>
 #include <AL/al.h>
 #include <AL/alc.h>
@@ -20,6 +21,7 @@ private:
     ALint  distanceModel;   // default: AL_NONE - 2D
     int readCounter;
     std::ifstream in;
+    char * data;
 
     ALenum checkALerrors(void);
     std::int32_t convert_to_int(char* buffer, std::size_t len);

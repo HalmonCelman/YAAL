@@ -1,6 +1,7 @@
 #include "Sound.h"
 
 #include <iostream>
+
 #include <fstream>
 #include <cstring>
 #include <bit>
@@ -219,7 +220,7 @@ bool Sound::Play(void){ //by streaming technique
     alSourcePlay(source);
     if(checkALerrors()) return false;
     state = AL_PLAYING;
-    std::cout<<"Started playing sound"<<std::endl;
+    std::cout<<"Started playing sound: "<<filename<<std::endl;
     return true;
 }
 
@@ -227,6 +228,7 @@ bool Sound::Update(void){
     ALint buffersProcessed = 0;
 
     alGetSourcei(source,AL_BUFFERS_PROCESSED,&buffersProcessed);
+
     if(buffersProcessed <= 0) return true;
 
     for(int i=0;i<buffersProcessed;i++){
@@ -259,12 +261,9 @@ bool Sound::Update(void){
         if(buffersPlayed >= totalBuffers){
         
             ALuint buffer;
-            alSourceUnqueueBuffers(source,2,&buffer);
-            alDeleteBuffers(2,soundBuffers);
-            alDeleteSources(1,&source);
+            alSourceUnqueueBuffers(source,SOUND_BUFFERS,&buffer);\
             in.close();
             if(isLooped){
-                CreateSource();
                 Open(filename);
                 Play();
                 return true;
@@ -378,4 +377,6 @@ Sound::Sound()
 }
 
 Sound::~Sound(){
+    alDeleteSources(1, &source);
+    alDeleteBuffers(SOUND_BUFFERS, soundBuffers);
 }
