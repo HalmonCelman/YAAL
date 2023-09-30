@@ -13,19 +13,11 @@
 int main(){
     Sound_CreateListener();
 
-    Sound mob2,mob;
-    mob.Open("protector.wav");
-    mob2.Open("getout.wav");
+    Sound mob;
+    mob.Open("UT.wav");
     mob.CreateSource();
-    mob2.CreateSource();
     mob.Play();
-    mob2.Play();
-    bool res1,res2;
-    do
-    {
-        res1=mob.Update();
-        res2=mob2.Update();
-    } while (res1 || res2);
+    while(mob.Update());
         
     Sound_DeleteListener();
     

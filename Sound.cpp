@@ -139,8 +139,19 @@ bool Sound::Open(const char * file){
     }
     if(std::strncmp(buffer, "data", 4) != 0)
     {
+        if(std::strncmp(buffer, "LIST", 4) != 0){
         std::cerr << "ERROR: file is not a valid WAVE file (doesn't have 'data' tag)" << std::endl;
         return false;
+        }else{
+            //skip LIST subchunk
+            in.read(buffer, 4);
+            int tmpBytesToSkip = convert_to_int(buffer, 4);
+
+            char * tmpbuff;
+            tmpbuff= new char[tmpBytesToSkip];
+            in.read(tmpbuff,tmpBytesToSkip);
+            delete [] tmpbuff;
+        }
     }
 
     // size of data
