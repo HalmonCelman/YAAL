@@ -1,3 +1,6 @@
+/*
+Library by KK
+*/
 #include "Sound.h"
 
 #include <iostream>
@@ -176,6 +179,8 @@ bool Sound::Open(const char * file){
             << (int)bitDepth << " bps" << std::endl;
         return false;
     }
+    
+
     return true;
 }
 
@@ -220,15 +225,17 @@ bool Sound::Play(void){ //by streaming technique
     alSourcePlay(source);
     if(checkALerrors()) return false;
     state = AL_PLAYING;
+    isPlaying=true;
     std::cout<<"Started playing sound: "<<filename<<std::endl;
     return true;
 }
 
 bool Sound::Update(void){
+    if(!isPlaying)
+        return false;
+
     ALint buffersProcessed = 0;
-
     alGetSourcei(source,AL_BUFFERS_PROCESSED,&buffersProcessed);
-
     if(buffersProcessed <= 0) return true;
 
     for(int i=0;i<buffersProcessed;i++){
@@ -261,21 +268,20 @@ bool Sound::Update(void){
         if(buffersPlayed >= totalBuffers){
         
             ALuint buffer;
-            alSourceUnqueueBuffers(source,SOUND_BUFFERS,&buffer);\
+            alSourceUnqueueBuffers(source,SOUND_BUFFERS,&buffer);
             in.close();
             if(isLooped){
                 Open(filename);
                 Play();
                 return true;
             }else{
+                isPlaying=false;
                 return false;
             }
         }else{
             alSourcePlay(source);
         }
     }
-    
-    
 
     return true;
 }
@@ -377,6 +383,60 @@ Sound::Sound()
 }
 
 Sound::~Sound(){
-    alDeleteSources(1, &source);
     alDeleteBuffers(SOUND_BUFFERS, soundBuffers);
+    alDeleteSources(1, &source);
+}
+
+// standalone functions
+static ALCdevice *device;
+static ALCcontext *context;
+
+
+static void list_audio_devices(const ALCchar *devices)
+{
+        const ALCchar *device = devices, *next = devices + 1;
+        size_t len = 0;
+
+        fprintf(stdout, "Devices list:\n");
+        fprintf(stdout, "----------\n");
+        while (device && *device != '\0' && next && *next != '\0') {
+                fprintf(stdout, "%s\n", device);
+                len = strlen(device);
+                device += (len + 1);
+                next += (len + 2);
+        }
+        fprintf(stdout, "----------\n");
+}
+
+void Sound_CreateListener(void){
+    device = alcOpenDevice(NULL);
+    context = alcCreateContext(device, NULL);
+
+    alcMakeContextCurrent(context);
+
+    ALboolean enumeration;
+
+    enumeration = alcIsExtensionPresent(NULL, "ALC_ENUMERATION_EXT");
+    if (enumeration == AL_FALSE)
+            std::cout<< "enumeration not supported\n";
+    else
+        std::cout<< "enumeration supported\n";
+
+    list_audio_devices(alcGetString(NULL, ALC_DEVICE_SPECIFIER));
+
+
+    ALfloat listenerOri[] = { 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f };
+
+    alListener3f(AL_POSITION, 0, 0, 1.0f);
+    // check for errors
+    alListener3f(AL_VELOCITY, 0, 0, 0);
+    // check for errors
+    alListenerfv(AL_ORIENTATION, listenerOri);
+}
+
+void Sound_DeleteListener(void){
+    device = alcGetContextsDevice(context);
+    alcMakeContextCurrent(NULL);
+    alcDestroyContext(context);
+    alcCloseDevice(device);
 }

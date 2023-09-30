@@ -41,7 +41,8 @@ public:
     ALenum  format; 
     ALfloat pitch;      // speed of play, default: 1
     ALfloat gain;       // gain (how loud), default: 1 - each division by 2: -6dB
-    ALint isLooped;     // false: not looped, true: looped, default: false
+    bool isLooped;     // false: not looped, true: looped, default: false
+    bool isPlaying;
 
     ALfloat positionX;  // default: 0,0,0
     ALfloat positionY;
@@ -59,4 +60,8 @@ public:
     bool Play(void);                   // if error occurs - returns false, unless returns true
     bool Update(void);                 // if error: false, unless true
     void PrintSummary(void);
+    
 };
+
+void Sound_CreateListener(void);         //connects to deviace, creates context, creates listener
+void Sound_DeleteListener(void);

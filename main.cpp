@@ -10,116 +10,25 @@
 #include "Sound.h"
 
 
-static void list_audio_devices(const ALCchar *devices)
-{
-        const ALCchar *device = devices, *next = devices + 1;
-        size_t len = 0;
-
-        fprintf(stdout, "Devices list:\n");
-        fprintf(stdout, "----------\n");
-        while (device && *device != '\0' && next && *next != '\0') {
-                fprintf(stdout, "%s\n", device);
-                len = strlen(device);
-                device += (len + 1);
-                next += (len + 2);
-        }
-        fprintf(stdout, "----------\n");
-}
-
-
 int main(){
+    Sound_CreateListener();
 
-ALCdevice *device;
-
-device = alcOpenDevice(NULL);
-
-ALCcontext *context;
-
-context = alcCreateContext(device, NULL);
-alcMakeContextCurrent(context);
-
-
-ALboolean enumeration;
-
-enumeration = alcIsExtensionPresent(NULL, "ALC_ENUMERATION_EXT");
-if (enumeration == AL_FALSE)
-        std::cout<< "enumeration not supported\n";
-else
-       std::cout<< "enumeration supported\n";
-
-list_audio_devices(alcGetString(NULL, ALC_DEVICE_SPECIFIER));
-
-
-ALfloat listenerOri[] = { 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f };
-
-alListener3f(AL_POSITION, 0, 0, 1.0f);
-// check for errors
-alListener3f(AL_VELOCITY, 0, 0, 0);
-// check for errors
-alListenerfv(AL_ORIENTATION, listenerOri);
-
-/*
-
-
-// Wypełnianie buforów dźwiękowych początkowymi danymi
-    alBufferData(buffers[0], format, soundData, sizeof(ALuint), 44100);
-    alBufferData(buffers[1], format, soundData, sizeof(ALuint), 44100);
-    checkOpenALError("Błąd przy przekazywaniu danych do buforów dźwiękowych");
-
-
-// Powiązanie buforów dźwiękowych z źródłem dźwięku
-    alSourceQueueBuffers(source, 2, buffers);
-    checkOpenALError("Błąd przy powiązywaniu buforów z źródłem dźwięku");
-
-
-alBufferData(buffer, format, soundData, size, sampleRate);
-checkOpenALError("Błąd przy tworzeniu bufora zrodla");
-alSourcei(source, AL_BUFFER, buffer);
-
-alSourcePlay(source);
-// check for errors
-
-checkOpenALError("Błąd przy odtwarzaniu zrodla");
-ALint source_state;
-alGetSourcei(source, AL_SOURCE_STATE, &source_state);
-// check for errors
-while (source_state == AL_PLAYING) {
-        alGetSourcei(source, AL_SOURCE_STATE, &source_state);
-        // check for errors
-}
-
-alDeleteSources(1, &source);
-alDeleteBuffers(1, &buffer);
-device = alcGetContextsDevice(context);
-alcMakeContextCurrent(NULL);
-alcDestroyContext(context);
-alcCloseDevice(device);
-*/
     Sound mob2,mob;
-    mob.Open("YMCA.wav");
-    mob.isLooped = false;
-    mob.PrintSummary();
-    mob.CreateSource();
-    mob2.isLooped = true;
+    mob.Open("protector.wav");
     mob2.Open("getout.wav");
-    mob2.positionX=5;
-    mob2.PrintSummary();
+    mob.CreateSource();
     mob2.CreateSource();
-    if(!mob2.Play() || !mob.Play()){
-        std::cout<<"from play function - source propably not created";
-    }else{
-        bool res1=mob.Update();
-        bool res2=mob2.Update();
-        while(res1 || res2){
-            res1=mob.Update();
-            res2=mob2.Update();
-        }
-    }
+    mob.Play();
+    mob2.Play();
+    bool res1,res2;
+    do
+    {
+        res1=mob.Update();
+        res2=mob2.Update();
+        std::cout<<res1<<" "<<res2<<std::endl;
+    } while (res1 || res2);
         
-
-    
-      
-    
+    Sound_DeleteListener();
     
     return 0;
 }
