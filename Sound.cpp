@@ -184,16 +184,45 @@ bool Sound::Open(const char * file){
     return true;
 }
 
+void Sound::setPosition(ALfloat x,ALfloat y, ALfloat z){
+    positionX=x;
+    positionY=y;
+    positionZ=z;
+
+    alSource3f(source, AL_POSITION, positionX, positionY, positionZ);
+}
+
+void Sound::setVelocity(ALfloat v_x,ALfloat v_y, ALfloat v_z){
+    velocityX=v_x;
+    velocityY=v_y;
+    velocityZ=v_z;
+
+    alSource3f(source, AL_VELOCITY, velocityX, velocityY, velocityZ);
+}
+
+void Sound::setPitch(ALfloat pitchToSet){
+    pitch=pitchToSet;
+
+    alSourcef(source, AL_PITCH, pitch);
+}
+
+void Sound::setGain(ALfloat gainToSet){
+    gain=gainToSet;
+
+    alSourcef(source, AL_GAIN, gain);
+}
+
+void Sound::setDistanceModel(ALenum model){
+    distanceModel=model;
+
+    alSourcei(source, AL_DISTANCE_MODEL, distanceModel);
+}
+
 bool Sound::CreateSource(void){
     alGenSources((ALuint)1, &source);
     if(checkALerrors()) return false;
 
-    alSourcef(source, AL_PITCH, pitch);
-    alSourcef(source, AL_GAIN, gain);
-    alSource3f(source, AL_POSITION, positionX, positionY, positionZ);
-    alSource3f(source, AL_VELOCITY, velocityX, velocityY, velocityZ);
-    alSourcei(source, AL_LOOPING, false);
-    alSourcei(source, AL_DISTANCE_MODEL, distanceModel);
+    alSourcei(source, AL_LOOPING, false); //because of streaming 
     if(checkALerrors()) return false;
 
     std::cout<<"Created source"<<std::endl;
@@ -408,7 +437,7 @@ static void list_audio_devices(const ALCchar *devices)
         fprintf(stdout, "----------\n");
 }
 
-void Sound_CreateListener(void){
+static void createDeviceContext(void){
     device = alcOpenDevice(NULL);
     context = alcCreateContext(device, NULL);
 
@@ -422,16 +451,30 @@ void Sound_CreateListener(void){
     else
         std::cout<< "enumeration supported\n";
 
-    list_audio_devices(alcGetString(NULL, ALC_DEVICE_SPECIFIER));
+    //list_audio_devices(alcGetString(NULL, ALC_DEVICE_SPECIFIER)); //can be useful when choosing device - todo
+}
 
-
+void Sound_CreateListener(void){
+    createDeviceContext();
     ALfloat listenerOri[] = { 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f };
 
-    alListener3f(AL_POSITION, 0, 0, 1.0f);
+    alListener3f(AL_POSITION, 0, 0, 0);
     // check for errors
     alListener3f(AL_VELOCITY, 0, 0, 0);
     // check for errors
     alListenerfv(AL_ORIENTATION, listenerOri);
+}
+
+void Sound_SetListenerPosition(ALfloat x, ALfloat y, ALfloat z){
+     alListener3f(AL_POSITION, x, y, z);
+}
+
+void Sound_SetListenerVelocity(ALfloat v_x, ALfloat v_y, ALfloat v_z){
+     alListener3f(AL_VELOCITY, v_x, v_y, v_z);
+}
+
+void Sound_SetListenerOrientation(ALfloat * orientation){
+     alListenerfv(AL_ORIENTATION, orientation);
 }
 
 void Sound_DeleteListener(void){

@@ -56,12 +56,22 @@ public:
 
     //methods
     bool Open(const char * file);      // if error occurs - returns false, unless returns true
+    
     bool CreateSource(void);           // if error occurs - returns false, unless returns true
     bool Play(void);                   // if error occurs - returns false, unless returns true
     bool Update(void);                 // if error: false, unless true
     void PrintSummary(void);
     
+    void setPosition(ALfloat x,ALfloat y, ALfloat z);
+    void setVelocity(ALfloat v_x,ALfloat v_y, ALfloat v_z);
+    void setPitch(ALfloat pitchToSet);
+    void setGain(ALfloat gainToSet);
+    void setDistanceModel(ALenum model);
 };
 
-void Sound_CreateListener(void);         //connects to deviace, creates context, creates listener
+void Sound_CreateListener(void);         //connects to deviace, creates context, creates listener - default position:0,0,0
 void Sound_DeleteListener(void);
+//these 3 functions below should be used AFTER Sound_CreateListener() - this function sets all these values to default
+void Sound_SetListenerPosition(ALfloat x, ALfloat y, ALfloat z); 
+void Sound_SetListenerVelocity(ALfloat v_x, ALfloat v_y, ALfloat v_z);
+void Sound_SetListenerOrientation(ALfloat * orientation);

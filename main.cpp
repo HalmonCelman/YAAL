@@ -25,7 +25,6 @@ int main(){
     {
         res1=mob.Update();
         res2=mob2.Update();
-        std::cout<<res1<<" "<<res2<<std::endl;
     } while (res1 || res2);
         
     Sound_DeleteListener();

@@ -1,4 +1,4 @@
 # to be done or optimized
 
 - Sound.cpp - Sound::Update - when isLooped shouldn't close and open back file, instead it should just play it, idk why doesn't work
-- Cleaning (?) when end of using device, context etc
+- Choosing audio device
