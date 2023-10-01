@@ -75,6 +75,7 @@ public:
 void Sound_CreateListener(void);         //connects to deviace, creates context, creates listener - default position:0,0,0
 void Sound_DeleteListener(void);
 //these 3 functions below should be used AFTER Sound_CreateListener() - this function sets all these values to default
+void Sound_SetListenerGain(ALfloat gain); 
 void Sound_SetListenerPosition(ALfloat x, ALfloat y, ALfloat z); 
 void Sound_SetListenerVelocity(ALfloat v_x, ALfloat v_y, ALfloat v_z);
 void Sound_SetListenerOrientation(ALfloat * orientation);

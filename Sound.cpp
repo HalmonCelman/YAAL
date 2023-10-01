@@ -498,6 +498,10 @@ void Sound_CreateListener(void){
     alListenerfv(AL_ORIENTATION, listenerOri);
 }
 
+void Sound_SetListenerGain(ALfloat gain){
+    alListenerf(AL_GAIN,gain);
+}
+
 void Sound_SetListenerPosition(ALfloat x, ALfloat y, ALfloat z){
      alListener3f(AL_POSITION, x, y, z);
 }
