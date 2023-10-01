@@ -52,8 +52,6 @@ public:
     ALfloat velocityY;
     ALfloat velocityZ;
 
-    bool is3D;       // false: 2D, true: 3D, default: false
-
     //methods
     bool Open(const char * file);      // if error occurs - returns false, unless returns true
     
@@ -67,6 +65,11 @@ public:
     void setPitch(ALfloat pitchToSet);
     void setGain(ALfloat gainToSet);
     void setDistanceModel(ALenum model);
+    void setReferenceDistance(float distance);
+    void setMaxDistance(float distance);
+    void setRollOffFactor(float factor);
+    void setMinGain(float minGain);
+    void setMaxGain(float maxGain);
 };
 
 void Sound_CreateListener(void);         //connects to deviace, creates context, creates listener - default position:0,0,0

@@ -151,6 +151,10 @@ bool Sound::Open(const char * file){
             tmpbuff= new char[tmpBytesToSkip];
             in.read(tmpbuff,tmpBytesToSkip);
             delete [] tmpbuff;
+            in.read(buffer, 4);
+            if(std::strncmp(buffer, "data", 4) != 0){
+                std::cerr << "ERROR: file is not a valid WAVE file (doesn't have 'data' tag)" << std::endl;
+            }
         }
     }
 
@@ -228,6 +232,27 @@ void Sound::setDistanceModel(ALenum model){
 
     alSourcei(source, AL_DISTANCE_MODEL, distanceModel);
 }
+
+void Sound::setReferenceDistance(float distance){
+    alSourcef(source,AL_REFERENCE_DISTANCE,distance);
+}
+
+void Sound::setRollOffFactor(float factor){
+    alSourcef(source,AL_ROLLOFF_FACTOR,factor);
+}
+
+void Sound::setMaxDistance(float distance){
+    alSourcef(source,AL_MAX_DISTANCE,distance);
+}
+
+void Sound::setMinGain(float minGain){
+    alSourcef(source,AL_MIN_GAIN,minGain);
+}
+
+void Sound::setMaxGain(float maxGain){
+    alSourcef(source,AL_MAX_GAIN,maxGain);
+}
+
 
 bool Sound::CreateSource(void){
     alGenSources((ALuint)1, &source);
@@ -382,23 +407,22 @@ void Sound::PrintSummary(void){
     }
     std::cout<<std::endl;
     std::cout<<"pitch: "<<pitch<<std::endl;
-    std::cout<<"gain: "<<gain<<std::endl;
+    float tmpgain;
+    alGetSourcef(source,AL_GAIN,&tmpgain);
+    std::cout<<"gain: "<<tmpgain<<std::endl;
     std::cout<<"isLooped: "<<((isLooped)?"looped":"not looped")<<std::endl;
     std::cout<<std::endl;
     std::cout<<"position - x: "<<positionX<<" y: "<<positionY<<" z: "<<positionZ<<std::endl;
     std::cout<<std::endl;
     std::cout<<"velocity - x: "<<velocityX<<" y: "<<velocityY<<" z: "<<velocityZ<<std::endl;
-    std::cout<<std::endl<<"tribe: "<<((is3D)?"3D":"2D")<<std::endl;
     std::cout<<"======================"<<std::endl;
 }
-
-
 
 Sound::Sound()
 :   counter         ( 0 ),
     readCounter     ( 0 ),
     state           ( AL_NONE ),
-    distanceModel   ( AL_NONE ),
+    distanceModel   ( AL_INVERSE_DISTANCE_CLAMPED ),
     
     channels        ( 0 ),
     sampleRate      ( 0 ),
@@ -415,9 +439,7 @@ Sound::Sound()
 
     velocityX       ( 0 ),
     velocityY       ( 0 ),
-    velocityZ       ( 0 ),
-
-    is3D            ( false )
+    velocityZ       ( 0 )
 {
     std::cout << "Created new sound object" << std::endl; 
 }
