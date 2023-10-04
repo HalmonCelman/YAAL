@@ -9,5 +9,5 @@ Makefile
 .vscode
 
 #Custom
-OPENAL
-libSound.a
+Example
+*.a
