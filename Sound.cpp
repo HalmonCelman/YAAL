@@ -261,7 +261,6 @@ bool Sound::CreateSource(void){
     alSourcei(source, AL_LOOPING, false); //because of streaming 
     if(checkALerrors()) return false;
 
-    std::cout<<"Created source"<<std::endl;
     return true;
 }
 
@@ -291,7 +290,7 @@ bool Sound::Play(void){ //by streaming technique
     if(checkALerrors()) return false;
     state = AL_PLAYING;
     isPlaying=true;
-    std::cout<<"Started playing sound: "<<filename<<std::endl;
+    
     return true;
 }
 
@@ -441,7 +440,6 @@ Sound::Sound()
     velocityY       ( 0 ),
     velocityZ       ( 0 )
 {
-    std::cout << "Created new sound object" << std::endl; 
 }
 
 Sound::~Sound(){
@@ -479,10 +477,6 @@ static void createDeviceContext(void){
     ALboolean enumeration;
 
     enumeration = alcIsExtensionPresent(NULL, "ALC_ENUMERATION_EXT");
-    if (enumeration == AL_FALSE)
-            std::cout<< "enumeration not supported\n";
-    else
-        std::cout<< "enumeration supported\n";
 
     //list_audio_devices(alcGetString(NULL, ALC_DEVICE_SPECIFIER)); //can be useful when choosing device - todo
 }
