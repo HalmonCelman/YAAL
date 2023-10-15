@@ -8,7 +8,6 @@ it's basicly wrapper for OpenAL - to make things easier
 - streaming files
 
 ## How should I use it?
-- just install OpenAL as it's on their github
 - add this repo as a submodule and subdirectory
 - All sounds you want to use in 3D mode should be mono
 
