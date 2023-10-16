@@ -21,7 +21,7 @@ endif()
 
 add_subdirectory(external/OpenAL)
 
-add_library( YAAL  Sound.h Sound.cpp $<TARGET_OBJECTS:OpenAL>)
+add_library( YAAL  Sound.h Sound.cpp)
 
 target_link_libraries(YAAL PRIVATE OpenAL)
 
