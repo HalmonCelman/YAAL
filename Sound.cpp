@@ -13,6 +13,9 @@ Library by KK
 #include <AL/al.h>
 #include <AL/alc.h>
 
+
+char YAAL_SOUNDBUFFER[SOUND_BUFFER_SIZE*SOUND_BUFFERS];
+
 ALenum Sound::checkALerrors(void){
     ALenum error = 0;
     error=alGetError();
@@ -269,10 +272,8 @@ bool Sound::Play(void){ //by streaming technique
     buffersPlayed = 0;
     totalBuffers = size/SOUND_BUFFER_SIZE + (size%SOUND_BUFFER_SIZE)?1:0;
     
-    char * data;
-    data=new char[SOUND_BUFFER_SIZE*SOUND_BUFFERS];
+    char * data = YAAL_SOUNDBUFFER;
 
-    std::memset(data,0,SOUND_BUFFER_SIZE*SOUND_BUFFERS);
     in.read(data,SOUND_BUFFER_SIZE*SOUND_BUFFERS);
     
     alGenBuffers(SOUND_BUFFERS,soundBuffers);
@@ -282,7 +283,6 @@ bool Sound::Play(void){ //by streaming technique
         if(checkALerrors()) return false;
     }
     readCounter=SOUND_BUFFER_SIZE*SOUND_BUFFERS;
-    delete [] data;
 
     alSourceQueueBuffers(source, SOUND_BUFFERS, soundBuffers);
     if(checkALerrors()) return false;
@@ -306,10 +306,7 @@ bool Sound::Update(void){
         
         if(readCounter < size){
     
-            char * data;
-            data=new char[SOUND_BUFFER_SIZE];
-
-            std::memset(data,0,SOUND_BUFFER_SIZE);
+            char * data = &YAAL_SOUNDBUFFER[i];
 
             in.read(data,SOUND_BUFFER_SIZE);
             readCounter+=SOUND_BUFFER_SIZE;
@@ -321,7 +318,6 @@ bool Sound::Update(void){
             counter++;
             
             state=AL_PLAYING;
-            delete [] data;
         }
         buffersPlayed++;
     }   
@@ -330,9 +326,8 @@ bool Sound::Update(void){
     alGetSourcei(source,AL_SOURCE_STATE,&state);
     if(state != AL_PLAYING){
         if(buffersPlayed >= totalBuffers){
-        
-            ALuint buffer;
-            alSourceUnqueueBuffers(source,SOUND_BUFFERS,&buffer);
+
+            alSourceUnqueueBuffers(source,SOUND_BUFFERS,soundBuffers);
             in.close();
             if(isLooped){
                 Open(filename);
