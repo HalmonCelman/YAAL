@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.12.0)
 
+project(YAAL)
+
 #submodules
 #update
 find_package(Git QUIET)
@@ -21,8 +23,10 @@ endif()
 
 add_subdirectory(external/OpenAL)
 
-add_library( YAAL  Sound.h Sound.cpp)
+add_library( ${PROJECT_NAME} Sound.h Sound.cpp)
 
-target_link_libraries(YAAL PRIVATE OpenAL)
+target_include_directories(${PROJECT_NAME} PRIVATE external/OpenAL/include)
 
-set_property(TARGET YAAL PROPERTY CXX_STANDARD 20)
+target_link_libraries(${PROJECT_NAME} PRIVATE OpenAL)
+
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)
